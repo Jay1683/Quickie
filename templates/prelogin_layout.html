@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <title>{%block title%} {%endblock%} - Quickie</title>
+  </head>
+  <body class="h-screen bg-slate-400">
+    {%with messages=get_flashed_messages(with_categories=true)%} 
+      {% if messages%}
+        <p class="{{messages[0][0]}} text-center">
+          {{messages[0][1]}}
+        </p>
+      {% endif %} 
+     {% endwith %}
+    {%block content%} {%endblock%}
+  </body>
+</html>

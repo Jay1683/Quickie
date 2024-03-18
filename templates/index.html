@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+    <title>Quickie - Home</title>
+    <link
+      rel="shortcut icon"
+      href="/static/images/icon.png"
+      type="image/x-icon"
+    />
+    <style>
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="m-0 p-0 h-screen bg-slate-400">
+    <main class="flex h-[100%]">
+      <div id="contacts" class="container w-1/4 bg-slate-800">
+        <nav
+          class="bg-slate-800 flex text-white justify-between items-center h-[8%]"
+        >
+          <div class="flex items-center">
+            <a href="/chat">
+              <img
+                src="/static/images/logo_white.png"
+                alt="img"
+                class="w-24 min-w-24 h-11 rounded-2xl px-4"
+              />
+            </a>
+            {{username}}
+          </div>
+          <div class="flex">
+            <a href="/logout">
+              <img
+                class="mx-3 cursor-pointer rounded-md px-1 py-1 border-2 border-gray-800 hover:border-gray-200 relative"
+                src="/static/images/logout_FILL0_wght400_GRAD0_opsz24.svg"
+                alt="logout"
+              />
+            </a>
+            <img
+              onclick="togglDropdown()"
+              class="mx-3 cursor-pointer rounded-md px-1 py-1 border-2 border-gray-800 hover:border-gray-200 relative"
+              src="/static/images/more_horiz_FILL0_wght400_GRAD0_opsz24.svg"
+              alt=""
+            />
+            <div
+              id="dropdown"
+              class="absolute border-2 z-10 hidden top-11 rounded-md mt-1"
+            >
+              <div
+                class="flex p-1 text-lg bg-gray-700 text-white cursor-pointer px-3"
+              >
+                <span onclick="toggleaddfriend()"> Add a Friend </span>
+                <div
+                  id="addfriend"
+                  class="absolute left-32 p-2 bg-slate-500 rounded-md hidden"
+                >
+                  <form id="add_friend_form" class="flex flex-col items-center">
+                    <span class="text-sm">
+                      Enter the username of your friend
+                    </span>
+                    <input
+                      id="add_friend_input"
+                      type="text"
+                      placeholder="Username"
+                      name="friend_username"
+                      class="rounded-md p-1 outline-none bg-slate-400"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      class="bg-slate-600 px-2 mt-1 rounded-md hover:bg-slate-700"
+                    >
+                      Add
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <div
+                class="p-1 text-lg bg-gray-700 text-white cursor-pointer px-3"
+              >
+                <span onclick="togglecreategroup()"> Create Group </span>
+                <div
+                  id="creategroup"
+                  class="absolute left-32 p-2 bg-slate-500 rounded-md hidden"
+                >
+                  <form
+                    id="create_group_form"
+                    class="flex flex-col items-center"
+                  >
+                    <span class="text-sm"> Enter the group name </span>
+                    <input
+                      id="create_group_input"
+                      type="text"
+                      placeholder="Group Name"
+                      name="group_name"
+                      class="rounded-md p-1 outline-none bg-slate-400"
+                      required
+                    />
+                    <span class="text-sm">Select the members of group</span>
+                    <div
+                      class="max-h-20 flex flex-col overflow-y-scroll border px-2 mt-1 w-full rounded-md"
+                    >
+                      {% for contact in friends %}
+                      <label for="{{contact}}">
+                        <input
+                          class="checkbox_group"
+                          type="checkbox"
+                          name="member_{{contact}}"
+                          id="{{contact}}"
+                          value="{{contact}}"
+                        />
+                        {{contact}}
+                      </label>
+                      {% endfor %}
+                    </div>
+                    <button
+                      type="submit"
+                      class="bg-slate-600 px-2 mt-1 rounded-md hover:bg-slate-700"
+                    >
+                      Create
+                    </button>
+                  </form>
+                </div>
+              </div>
+              <!-- <div
+                class="p-1 text-lg bg-gray-700 text-white cursor-pointer px-3"
+              >
+                <span onclick="togglejoingroup()"> Join a Group </span>
+                <div
+                  id="joingroup"
+                  class="absolute left-32 p-2 bg-slate-500 rounded-md hidden"
+                >
+                  <form id="join_group_form" class="flex flex-col items-center">
+                    <span class="text-sm"> Enter the group name </span>
+                    <input
+                      id="join_group_input"
+                      type="text"
+                      placeholder="Group Name"
+                      name="group_name"
+                      class="rounded-md p-1 outline-none bg-slate-400"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      class="bg-slate-600 px-2 mt-1 rounded-md hover:bg-slate-700"
+                    >
+                      Join
+                    </button>
+                  </form>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </nav>
+        <div class="container overflow-y-scroll max-h-full">
+          {% for contact in contacts %}
+          <div
+            class="bg-gray-600 p-2 cursor-pointer rounded-sm w-[99%] mt-1 font-bold mx-auto"
+          >
+            <a class="w-full h-full" href="/chat/{{contact}}"> {{contact}} </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% if chat_name %} {% if group %}
+      <div class="w-3/4">
+        <nav
+          class="bg-slate-800 flex w-[100%] text-white align-middle items-center h-[8%]"
+        >
+          <img
+            src="/static/images/pp.png"
+            class="h-10 rounded-full mx-4"
+            alt=""
+          />
+          <div>
+            <h1>{{chat_name}}</h1>
+            {% for member in group["members"] %} {% if member==username %}
+            <span class="text-sm">You</span>
+            {%else%}
+            <span class="text-sm">{{member}}</span>
+            {% endif %} {% endfor %}
+          </div>
+        </nav>
+        <div id="messages" class="bg-gray-700 h-[82%] static overflow-y-scroll">
+          {% if messages %} {% for message in messages %} {% if
+          message["sender"]==username %}
+          <div class="w-full p-1 flex justify-end">
+            <div
+              class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2"
+            >
+              {% if message["file"] %}
+              <img
+                src="/static/files/{{message['message']}}"
+                width="300"
+                alt=""
+              />
+              {%else%} {{message["message"]}} {%endif%}
+              <div class="text-xs text-gray-600">{{message["time"]}}</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="w-full p-1 flex justify-start">
+            <div
+              class="bg-slate-400 h-full w-fit max-w-[65%] p-1 rounded-lg left-5-0 mx-2"
+            >
+              <div class="text-[12px] px-1">{{message["sender"]}}</div>
+              <div class="w-full bg-slate-50 p-1 rounded-lg">
+                {% if message["file"] %}
+                <img
+                  src="/static/files/{{message['message']}}"
+                  width="300"
+                  alt=""
+                />
+                {%else%} {{message["message"]}} {%endif%}
+              </div>
+              <div class="text-xs text-gray-700 px-1">{{message["time"]}}</div>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endif %}
+          <!-- <div class="w-full p-1 flex justify-start">
+            <div
+              class="bg-slate-400 h-full w-fit max-w-[65%] p-1 rounded-lg left-5-0 mx-2"
+            >
+              <div class="text-[12px] px-1">{{username}}</div>
+              <div class="w-full bg-slate-50 p-1 rounded-lg">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                Quaerat, vel odio quisquam veritatis, ut quae deleniti
+                consectetur rerum fugiat repellendus nostrum architecto
+                laudantium adipisci aliquid nulla natus quam eligendi cumque
+                tenetur, dolorem dolore? Optio.
+              </div>
+              <div class="text-xs text-gray-700 px-1">${data.time}</div>
+            </div>
+          </div> -->
+        </div>
+        <div id="form_field" class="h-[10%]">
+          <div id="message_form_field" class="h-full">
+            <form
+              id="message_input_form"
+              class="inp-field flex items-center h-full bg-slate-100"
+            >
+              <label for="file_input" class="px-2 cursor-pointer"
+                ><img
+                  src="/static/images/attach.svg"
+                  alt="Attach file"
+                  width="20px"
+              /></label>
+              <input
+                id="file_input"
+                type="file"
+                name="file"
+                class="hidden"
+                accept="image/*"
+              />
+              <input
+                id="message_input"
+                class="w-[80%] border outline-none mx-4 h-10 p-4"
+                type="text"
+                name="message"
+                placeholder="Enter your message"
+              />
+              <button
+                id="send"
+                type="submit"
+                class="mx-3 bg-slate-500 text-white py-2 px-3 rounded-md hover:bg-slate-600"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="w-3/4">
+        <nav
+          class="bg-slate-800 flex w-[100%] text-white align-middle items-center h-[8%]"
+        >
+          <img
+            src="/static/images/pp.png"
+            class="h-10 rounded-full mx-4"
+            alt=""
+          />
+          <h1>{{chat_name}}</h1>
+        </nav>
+        <div id="messages" class="bg-gray-700 h-[82%] static overflow-y-scroll">
+          {% if messages %} {% for message in messages %} {% if
+          message["sender"]==username %}
+          <div class="w-full p-1 flex justify-end">
+            <div
+              class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2"
+            >
+              {% if message["file"] %}
+              <img
+                src="/static/files/{{message['message']}}"
+                width="300"
+                alt=""
+              />
+              {%else%} {{message["message"]}} {%endif%}
+              <div class="text-xs text-gray-600">{{message["time"]}}</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="w-full p-1 flex justify-start">
+            <div
+              class="bg-slate-400 h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2"
+            >
+              {% if message["file"] %}
+              <img
+                src="/static/files/{{message['message']}}"
+                width="300"
+                alt=""
+              />
+              {%else%} {{message["message"]}} {%endif%}
+              <div class="text-xs text-gray-600">{{message["time"]}}</div>
+            </div>
+          </div>
+          {% endif %} {% endfor %} {% endif %}
+        </div>
+        <div id="form_field" class="h-[10%]">
+          <!-- <div id="send_file_field" class="h-full">
+            <div class="flex items-center h-full bg-white justify-between">
+              <div
+                class="mx-3 border px-2 rounded-lg text-slate-800 border-slate-500"
+              >
+                ${file_name}
+              </div>
+              <div id="send_file" class="mx-5 cursor-pointer">
+                <img
+                  src="/static/images/send_FILL0_wght400_GRAD0_opsz24.svg"
+                  alt="send"
+                />
+              </div>
+            </div>
+          </div> -->
+          <!-- <div
+            id="send_file_field"
+            class="flex items-center hidden h-full bg-white justify-between"
+          >
+            <div
+              class="mx-3 border px-2 rounded-lg text-slate-800 border-slate-500"
+            >
+              Hello
+            </div>
+            <div id="send_file" class="mx-5 cursor-pointer">
+              <img
+                src="/static/images/send_FILL0_wght400_GRAD0_opsz24.svg"
+                alt="send"
+              />
+            </div>
+          </div> -->
+          <div id="message_form_field" class="h-full w-full">
+            <form
+              id="message_input_form"
+              class="inp-field flex items-center h-full w-full bg-slate-100"
+            >
+              <label for="file_input" class="px-2 cursor-pointer"
+                ><img
+                  src="/static/images/attach.svg"
+                  alt="Attach file"
+                  width="20px"
+              /></label>
+              <input
+                id="file_input"
+                type="file"
+                name="file"
+                class="hidden"
+                accept="image/*"
+              />
+              <input
+                id="message_input"
+                class="w-[80%] border outline-none mx-4 h-10 p-4"
+                type="text"
+                name="message"
+                placeholder="Enter your message"
+              />
+              <button
+                id="send"
+                type="submit"
+                class="mx-3 bg-slate-500 text-white py-2 px-3 rounded-md hover:bg-slate-600"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endif %} {% else %}
+      <div id="content" class="container w-3/4 relative bg-slate-700">
+        <div class="container flex items-center justify-center w-full h-full">
+          <img src="/static/images/user.png" alt="" />
+        </div>
+        {% endif %}
+      </div>
+    </main>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      const socket = io.connect("http://127.0.0.1:5000");
+      scrollToBottom();
+      socket.on("added_friend", function (data) {
+        const newNode = document.createElement("div");
+        newNode.classList.add("w-full");
+        newNode.classList.add("justify-center");
+        newNode.classList.add("p-1");
+        newNode.classList.add("flex");
+        if (data.reciever == "{{username}}") {
+          newNode.innerHTML = `<div class="bg-gray-800 px-2 p-1 rounded-md text-gray-400">
+            ${data.sender} joined you
+            </div>`;
+        }
+        if (data.sender == "{{username}}") {
+          newNode.innerHTML = `<div class="bg-gray-800 px-2 p-1 rounded-md text-gray-400">
+            you joined ${data.reciever}
+            </div>`;
+        }
+      });
+
+      socket.on("notify", function (data) {
+        if (document.hidden) {
+          if (data.group) {
+            if (data.recievers.includes("{{username}}")) {
+              Notification.requestPermission().then((perm) => {
+                if (perm === "granted") {
+                  new Notification(data.group_name, {
+                    body: `${data.sender}: ${data.message}`,
+                  });
+                }
+              });
+            }
+          } else {
+            if (data.reciever == "{{username}}") {
+              Notification.requestPermission().then((perm) => {
+                if (perm === "granted") {
+                  new Notification(data.sender, {
+                    body: `${data.message}`,
+                  });
+                }
+              });
+            }
+          }
+        } else {
+          if (data.group) {
+            if (data.recievers.includes("{{username}}")) {
+              if (data.group_name != "{{chat_name}}") {
+                Notification.requestPermission().then((perm) => {
+                  if (perm === "granted") {
+                    new Notification(data.group_name, {
+                      body: `${data.sender}: ${data.message}`,
+                    });
+                  }
+                });
+              }
+            }
+          } else {
+            if (data.reciever == "{{username}}") {
+              if (data.sender != "{{chat_name}}") {
+                Notification.requestPermission().then((perm) => {
+                  if (perm === "granted") {
+                    new Notification(data.sender, {
+                      body: `${data.message}`,
+                    });
+                  }
+                });
+              }
+            }
+          }
+        }
+      });
+
+      socket.on("recieve_message", function (data) {
+        const newNode = document.createElement("div");
+        newNode.classList.add("w-full");
+        newNode.classList.add("p-1");
+        newNode.classList.add("flex");
+        if (data.group) {
+          if (data.reciever == "{{chat_name}}") {
+            if (data.sender == "{{username}}") {
+              newNode.classList.add("justify-end");
+              newNode.innerHTML = `<div class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+                  ${data.message}
+                  <div class="text-xs text-gray-600">${data.time}</div>
+                </div>`;
+              if (document.getElementById("messages")) {
+                document.getElementById("messages").append(newNode);
+              }
+              scrollToBottom();
+            } else {
+              newNode.classList.add("justify-start");
+              newNode.innerHTML = `<div class="bg-slate-400 h-full w-fit max-w-[65%] p-1 rounded-lg left-5-0 mx-2">
+                <div class="text-[12px] px-1">${data.sender}</div>
+              <div class="w-full bg-slate-50 p-1 rounded-lg">${data.message}</div>
+              <div class="text-xs text-gray-700 px-1">${data.time}</div>
+                </div>`;
+              if (document.getElementById("messages")) {
+                document.getElementById("messages").append(newNode);
+              }
+              scrollToBottom();
+            }
+          }
+        } else {
+          if (data.reciever == "{{username}}") {
+            newNode.classList.add("justify-start");
+            newNode.innerHTML = `<div class="bg-slate-400 h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+                  ${data.message}
+                  <div class="text-xs text-gray-600">${data.time}</div>
+                </div>`;
+            if (document.getElementById("messages")) {
+              document.getElementById("messages").append(newNode);
+            }
+            scrollToBottom();
+          }
+          if (data.sender == "{{username}}") {
+            newNode.classList.add("justify-end");
+            newNode.innerHTML = `<div class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+                ${data.message}
+                <div class="text-xs text-gray-600">${data.time}</div>
+              </div>`;
+            if (document.getElementById("messages")) {
+              document.getElementById("messages").append(newNode);
+            }
+            scrollToBottom();
+          }
+        }
+      });
+
+      document
+        .getElementById("create_group_form")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const formdata = new FormData(this);
+          var checkboxes = document.querySelectorAll(
+            'input[class="checkbox_group"]:checked'
+          );
+          if (checkboxes.length < 2) {
+            alert("Choose at least 2 friends");
+          } else {
+            var formDataObject = {};
+            formdata.forEach(function (value, key) {
+              formDataObject[key] = value;
+            });
+            const response = await fetch("/create_group", {
+              method: "POST", // *GET, POST, PUT, DELETE, etc.
+              mode: "cors", // no-cors, *cors, same-origin
+              cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+              credentials: "same-origin", // include, *same-origin, omit
+              headers: {
+                "Content-Type": "application/json",
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              redirect: "follow", // manual, *follow, error
+              referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+              body: JSON.stringify({
+                data: formDataObject,
+              }), // body data type must match "Content-Type" header
+            })
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.status == "failure") {
+                  alert(data.message);
+                } else {
+                  window.location.href = `/chat/${data.group}`;
+                }
+              });
+          }
+        });
+
+      const file_input = document.getElementById("file_input");
+      if (file_input) {
+        file_input.addEventListener("change", (e) => {
+          document.getElementById("message_form_field").classList.add("hidden");
+          var file = file_input.files[0];
+          var file_name = file.name;
+          var send_file = document.createElement("div");
+          send_file.id = "send_file_field";
+          send_file.classList.add("h-full");
+          send_file.innerHTML = `<div class="flex items-center h-full bg-white justify-between">
+            <div
+              class="mx-3 border px-2 rounded-lg text-slate-800 border-slate-500"
+            >
+              ${file_name}
+            </div>
+            <div id="send_file" class="mx-5 cursor-pointer">
+              <img
+                src="/static/images/send_FILL0_wght400_GRAD0_opsz24.svg"
+                alt="send"
+              />
+            </div>
+          </div>`;
+          document.getElementById("form_field").append(send_file);
+          document
+            .getElementById("send_file")
+            .addEventListener("click", function () {
+              var reader = new FileReader();
+              reader.onload = function (e) {
+                var group = false;
+                if ("{{group['status']}}" == "True") {
+                  group = true;
+                }
+                const now = new Date();
+                const time = now.getHours() + ":" + now.getMinutes();
+                var fileData = {
+                  file: e.target.result,
+                  file_name: file_name,
+                  sender: "{{username}}",
+                  time: time,
+                  group: group,
+                  reciever: "{{chat_name}}",
+                };
+                socket.emit("send_file", fileData);
+                document.getElementById("form_field").removeChild(send_file);
+                document
+                  .getElementById("message_form_field")
+                  .classList.remove("hidden");
+                document
+                  .getElementById("message_form_field")
+                  .classList.add("flex");
+              };
+              reader.readAsArrayBuffer(file);
+            });
+        });
+      }
+
+      socket.on("recieve_file", function (data) {
+        const newNode = document.createElement("div");
+        newNode.classList.add("w-full");
+        newNode.classList.add("p-1");
+        newNode.classList.add("flex");
+        if (data.group) {
+          if (data.reciever == "{{chat_name}}") {
+            if (data.sender == "{{username}}") {
+              newNode.classList.add("justify-end");
+              newNode.innerHTML = `<div class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+                <img src="/static/files/${data.file_name}" width="300" alt="" />
+                  <div class="text-xs text-gray-600">${data.time}</div>
+                </div>`;
+              if (document.getElementById("messages")) {
+                document.getElementById("messages").append(newNode);
+              }
+              scrollToBottom();
+            } else {
+              newNode.classList.add("justify-start");
+              newNode.innerHTML = `<div class="bg-slate-400 h-full w-fit max-w-[65%] p-1 rounded-lg left-5-0 mx-2">
+                <div class="text-[12px] px-1">${data.sender}</div>
+              <div class="w-full bg-slate-50 p-1 rounded-lg">
+                <img src="/static/files/${data.file_name}" width="300" alt="" />
+              </div>
+              <div class="text-xs text-gray-700 px-1">${data.time}</div>
+                </div>`;
+              if (document.getElementById("messages")) {
+                document.getElementById("messages").append(newNode);
+              }
+              scrollToBottom();
+            }
+          }
+        } else {
+          if (data.reciever == "{{username}}") {
+            newNode.classList.add("justify-start");
+            newNode.innerHTML = `<div class="bg-slate-400 h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+              <img src="/static/files/${data.file_name}" width="300" alt="" />
+                  <div class="text-xs text-gray-600">${data.time}</div>
+                </div>`;
+            if (document.getElementById("messages")) {
+              document.getElementById("messages").append(newNode);
+            }
+            scrollToBottom();
+          }
+          if (data.sender == "{{username}}") {
+            newNode.classList.add("justify-end");
+            newNode.innerHTML = `<div class="bg-white h-full w-fit max-w-[65%] p-2 rounded-lg left-5-0 mx-2">
+              <img src="/static/files/${data.file_name}" width="300" alt="" />
+                <div class="text-xs text-gray-600">${data.time}</div>
+              </div>`;
+            if (document.getElementById("messages")) {
+              document.getElementById("messages").append(newNode);
+            }
+            scrollToBottom();
+          }
+        }
+      });
+
+      const message_input = document.getElementById("message_input");
+      const messform = document.getElementById("message_input_form");
+      if (messform) {
+        messform.onsubmit = function (e) {
+          e.preventDefault();
+          const file = document.getElementById("file_input");
+          const now = new Date();
+          const time = now.getHours() + ":" + now.getMinutes();
+          let message = message_input.value.trim();
+          if (message.length) {
+            var group = false;
+            if ("{{group['status']}}" == "True") {
+              group = true;
+            }
+            socket.emit("send_message", {
+              sender: "{{username}}",
+              reciever: "{{chat_name}}",
+              message: message,
+              group: group,
+              time: time,
+            });
+          }
+          message_input.value = "";
+          file.value = null;
+          message_input.focus();
+        };
+      }
+
+      document.getElementById("add_friend_form").onsubmit = async function (e) {
+        e.preventDefault();
+        friend_username = document.getElementById("add_friend_input").value;
+        const response = await fetch("/add_friend", {
+          method: "POST", // *GET, POST, PUT, DELETE, etc.
+          mode: "cors", // no-cors, *cors, same-origin
+          cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+          credentials: "same-origin", // include, *same-origin, omit
+          headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          redirect: "follow", // manual, *follow, error
+          referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+          body: JSON.stringify({ username: friend_username }), // body data type must match "Content-Type" header
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status == "success") {
+              window.location.href = `/chat/${data.friend}`;
+            } else {
+              alert(data.message);
+            }
+          });
+      };
+
+      function scrollToBottom() {
+        var chatContainer = document.getElementById("messages");
+        if (chatContainer) {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+      }
+
+      function togglDropdown() {
+        let dropdown = document.getElementById("dropdown");
+        dropdown.classList.toggle("hidden");
+      }
+
+      function toggleaddfriend() {
+        let dropdown = document.getElementById("addfriend");
+        dropdown.classList.toggle("hidden");
+      }
+      function togglecreategroup() {
+        let dropdown = document.getElementById("creategroup");
+        dropdown.classList.toggle("hidden");
+      }
+      function togglejoingroup() {
+        let dropdown = document.getElementById("joingroup");
+        dropdown.classList.toggle("hidden");
+      }
+    </script>
+  </body>
+</html>

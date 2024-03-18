@@ -1,0 +1,64 @@
+{%extends "prelogin_layout.html"%} {%block title%}Registration{%endblock%}
+{%block content%}
+<div
+  class="w-2/6 bg-slate-500 min-w-[400px] m-auto relative top-[10%] rounded-[14px] shadow-lg shadow-black p-10 flex flex-col items-center justify-center"
+>
+  <form
+    class="flex flex-col justify-center items-center"
+    action="{{url_for('register')}}"
+    method="POST"
+  >
+    <img
+      class="w-[35%] rounded-full m-2"
+      src="/static/images/pp.png"
+      alt="Image"
+    />
+    <h1 class="text-4xl font-bold">Please Register</h1>
+    <div class="flex flex-col justify-center items-center">
+      {{form.username(class_="form-control m-1 rounded-md p-1 outline-none
+      px-2",placeholder="Username",autocomplete="off",focus="true")}}
+      <ul>
+        {%for error in form.username.errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+      </ul>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+      {{form.email(class_="form-control m-1 rounded-md p-1 outline-none
+      px-2",placeholder="Email",autocomplete="off")}}
+      <ul>
+        {%for error in form.email.errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+      </ul>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+      {{form.password(class_="form-control m-1 rounded-md p-1 outline-none
+      px-2",placeholder="Password")}}
+      <ul>
+        {%for error in form.password.errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+      </ul>
+    </div>
+    <div class="flex flex-col justify-center items-center">
+      {{form.confirm_pswd(class_="form-control m-1 rounded-md p-1 outline-none
+      px-2",placeholder="Confirm Password")}}
+      <ul>
+        {%for error in form.confirm_pswd.errors%}
+        <li>{{error}}</li>
+        {%endfor%}
+      </ul>
+    </div>
+    <div>
+      {{form.submin_btn(class_="bg-slate-600 p-2 mt-2 rounded-md
+      hover:bg-slate-700 cursor-pointer text-white")}}
+    </div>
+    {{form.csrf_token}}
+  </form>
+  <p class="text-white text-lg mt-2">Already Registered?</p>
+  <a href="{{url_for('login')}}" class="font-bold hover:underline text-blue-300"
+    >Log In</a
+  >
+</div>
+{%endblock%}
